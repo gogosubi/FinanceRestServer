@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity
 public class StockPriceAdditionalInfo {
 	@Id
 	// 주식가격
@@ -28,4 +27,23 @@ public class StockPriceAdditionalInfo {
 	private long year_low_price;
 	
 	// PER
+	private double per;
+	
+	// EPS
+	private long eps;
+	
+	// 추정PER
+	private double guessPer;
+	
+	// 추정EPS
+	private long guessEps;
+	
+	// PBR
+	private long pbr;
+	
+	// BPS
+	private long bps;
+	
+	// 배당수익률
+	private double dyRate;
 }

@@ -2,6 +2,8 @@ package com.realizer.FinanceRestServer.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,8 @@ public class StockPrice {
 	private String bsDt;
 	
 	// 종목정보
+	@ManyToOne
+	@JoinColumn(name="item_id")
 	private StockItem stockItem;
 	
 	// 종가
