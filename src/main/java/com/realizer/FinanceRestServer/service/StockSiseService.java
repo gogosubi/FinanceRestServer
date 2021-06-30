@@ -23,8 +23,8 @@ public class StockSiseService {
 	@Value("${stock.sise.url}")
 	private String stockSiseUrl;
 	
-    @Value("${stock.sise.selector.company}")
-    private String company_selector;
+    @Value("${stock.sise.selector.item}")
+    private String item_selector;
 
     @Value("${stock.sise.selector.content}")
     private String content_selector;
@@ -35,26 +35,34 @@ public class StockSiseService {
 		this.stockPriceRepository = stockPriceRepository;
 	}
 	
-	public void saveStockSise()
+	public void saveStockSise(String code)
 	{
-		Document document = Crawler.getCrawlingSite(stockSiseUrl);
+		StringBuilder url = new StringBuilder(stockSiseUrl);
+		url.append(code);
+		System.out.println(url);
+		Document document = Crawler.getCrawlingSite(url.toString());
 
         // 종목정보가 처음인 경우 종목 정보 저장
         StockItem stockItem = getStockItem(document)
         						.orElseThrow(()->new IllegalArgumentException("전달한 주소[" + stockSiseUrl + "에서 유효한 정보를 가져오지 못했습니다."));
 		
         // 종목정보가 처음인 경우 종목 정보 저장
-        stockItemRepository.findByItemcode(stockItem.getItemCode())
+        stockItemRepository.findByitemCode(stockItem.getItemCode())
                             .orElse(stockItemRepository.save(stockItem));
-		System.out.println("SAVE");
+        
+        // 종목시세정보
+        StockPrice stockPrice = getStockPrice(document)
+				.orElseThrow(()->new IllegalArgumentException("전달한 주소[" + stockSiseUrl + "에서 유효한 정보를 가져오지 못했습니다."));
+        stockPrice.setStockItem(stockItem);
+        stockPrice.setBsDt("20210630");
+        stockPriceRepository.save(stockPrice);
 	}
 	
 	private Optional<StockItem> getStockItem(Document document)
 	{
-
-        for (Element element : document.select(company_selector) )
+        for (Element element : document.select(item_selector) )
         {
-            String code = element.select("div > span").text();
+            String code = element.select("div > span.code").text();
             String name = element.select("h2").text();
             String market = element.select("div > img").attr("class");
 
@@ -70,7 +78,7 @@ public class StockSiseService {
 	private Optional<StockPrice> getStockPrice(Document document)
 	{
 
-        for (Element element : document.select(company_selector) )
+        for (Element element : document.select(item_selector) )
         {
             String code = element.select("div > span").text();
             String name = element.select("h2").text();

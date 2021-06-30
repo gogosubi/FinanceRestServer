@@ -19,7 +19,7 @@ public class CrawlingController
 	@GetMapping("/stock/sise/{code}")
 	public String crawlingStock(@PathVariable String code)
 	{
-		stockSiseService.saveStockSise();
+		stockSiseService.saveStockSise(code);
 		return "sise";
 	}
 }

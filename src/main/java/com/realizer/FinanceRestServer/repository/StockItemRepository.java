@@ -8,5 +8,5 @@ import com.realizer.FinanceRestServer.model.StockItem;
 
 public interface StockItemRepository extends JpaRepository<StockItem, Long> {
 
-    Optional<StockItem> findByItemcode(String code);
+    Optional<StockItem> findByitemCode(String code);
 }

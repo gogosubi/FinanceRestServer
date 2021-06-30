@@ -1,9 +1,15 @@
 package com.realizer.FinanceRestServer.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +23,10 @@ import lombok.NoArgsConstructor;
 @Entity
 public class StockPrice {
 
-	@Id
+	@Id // PK
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가
+	private Long id;
+	
 	// 기준일자
 	private String bsDt;
 	
@@ -40,4 +49,7 @@ public class StockPrice {
 	
 	// 거래량
 	private long amount;
+	
+	@CreationTimestamp
+	private Timestamp createDate;
 }
