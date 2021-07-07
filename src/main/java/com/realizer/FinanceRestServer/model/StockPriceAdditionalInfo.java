@@ -1,6 +1,8 @@
 package com.realizer.FinanceRestServer.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
@@ -12,10 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Entity
 public class StockPriceAdditionalInfo {
-	@Id
-	// 주식가격
-	private StockPrice stockPrice;
+	@Id 
+	@GeneratedValue 
+	private Long id;
 	
 	// 시가총액
 	private long totalMarketPrice;

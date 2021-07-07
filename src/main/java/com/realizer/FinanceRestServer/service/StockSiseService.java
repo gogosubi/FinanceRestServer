@@ -1,6 +1,7 @@
 package com.realizer.FinanceRestServer.service;
 
 import java.sql.Timestamp;
+import java.text.NumberFormat;
 import java.util.Optional;
 
 import javax.persistence.JoinColumn;
@@ -19,6 +20,7 @@ import com.realizer.FinanceRestServer.model.StockPrice;
 import com.realizer.FinanceRestServer.repository.StockItemRepository;
 import com.realizer.FinanceRestServer.repository.StockPriceRepository;
 import com.realizer.FinanceRestServer.util.Crawler;
+import com.realizer.FinanceRestServer.util.NumberUtility;
 
 @Service
 public class StockSiseService {
@@ -81,6 +83,7 @@ public class StockSiseService {
 	
 	private Optional<StockPrice> getStockPrice(Document document, StockItem stockItem)
 	{
+		
 
         for (Element element : document.select(item_selector) )
         {
@@ -97,11 +100,21 @@ public class StockSiseService {
             {
             	continue;
             }
+
+            Elements thContents = trContent.select("th");
+            Elements tdContents = trContent.select("td");
             
-                Elements tdContents = trContent.select("td");
-                System.out.println("ATTRIBUTE : " + tdContents.hasClass("num"));
-                System.out.println(tdContents.get(0).text());
-                System.out.println(tdContents.get(1).text());
+            System.out.println(thContents.get(0).text());
+//            System.out.println(tdContents.get(0).text());
+            System.out.println(NumberUtility.convertNumber(tdContents.get(0).text()));
+
+            //System.out.println("ATTRIBUTE : " + tdContents.hasClass("num"));
+            System.out.println(thContents.get(1).text());
+            System.out.println(tdContents.get(1).text());
+            
+//            StockPrice.builder()
+//            	.currentPrice(0)
+            
 //
 //                KoreaStats koreaStats = KoreaStats.builder()
 //                        .country(content.select("th").text())

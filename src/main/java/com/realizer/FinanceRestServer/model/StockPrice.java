@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -35,8 +36,8 @@ public class StockPrice {
 	@JoinColumn(name="item_id")
 	private StockItem stockItem;
 	
-	// 종가
-	private long closePrice;
+	// 현재가
+	private long currentPrice;
 	
 	// 시가
 	private long openPrice;
@@ -49,6 +50,10 @@ public class StockPrice {
 	
 	// 거래량
 	private long amount;
+	
+	@OneToOne 
+	@JoinColumn(name = "ADD_INFO_ID")
+	private StockPriceAdditionalInfo stockPriceAdditionalInfo;
 	
 	@CreationTimestamp
 	private Timestamp createDate;
