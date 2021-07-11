@@ -17,27 +17,25 @@ import org.springframework.stereotype.Service;
 import com.realizer.FinanceRestServer.model.MarketType;
 import com.realizer.FinanceRestServer.model.StockItem;
 import com.realizer.FinanceRestServer.model.StockPrice;
-import com.realizer.FinanceRestServer.repository.StockItemRepository;
-import com.realizer.FinanceRestServer.repository.StockPriceRepository;
+import com.realizer.FinanceRestServer.repository.dao.StockItemRepository;
+import com.realizer.FinanceRestServer.repository.dao.StockPriceRepository;
+import com.realizer.FinanceRestServer.repository.service.StockSiseRepository;
 import com.realizer.FinanceRestServer.util.Crawler;
 import com.realizer.FinanceRestServer.util.NumberUtility;
 
 @Service
-public class StockSiseService {
+public class NStockSiseService implements StockSiseRepository {
 	private StockItemRepository stockItemRepository;
 	
 	private StockPriceRepository stockPriceRepository;
 	
 	@Value("${stock.sise.url}")
 	private String stockSiseUrl;
-	
-    @Value("${stock.sise.selector.item}")
-    private String item_selector;
 
     @Value("${stock.sise.selector.content}")
     private String content_selector;
 
-	public StockSiseService(StockItemRepository stockItemRepository, StockPriceRepository stockPriceRepository) 
+	public NStockSiseService(StockItemRepository stockItemRepository, StockPriceRepository stockPriceRepository) 
 	{
 		this.stockItemRepository = stockItemRepository;
 		this.stockPriceRepository = stockPriceRepository;
@@ -59,42 +57,39 @@ public class StockSiseService {
                             .orElse(stockItemRepository.save(stockItem));
         
         // 종목시세정보
-        StockPrice stockPrice = getStockPrice(document, stockItem)
+        StockPrice stockPrice = getStockPrice(document)
 				.orElseThrow(()->new IllegalArgumentException("전달한 주소[" + stockSiseUrl + "에서 유효한 정보를 가져오지 못했습니다."));
 //        stockPriceRepository.save(stockPrice);
 	}
 	
 	private Optional<StockItem> getStockItem(Document document)
 	{
-        for (Element element : document.select(item_selector) )
-        {
-            String code = element.select("div > span.code").text();
-            String name = element.select("h2").text();
-            String market = element.select("div > img").attr("class");
-
-            return Optional.of(StockItem.builder().itemCode(code)
-                    .itemName(name)
-                    .type(MarketType.valueOf(market))
-                    .build());
-        }
-        
-        return Optional.of(new StockItem());
+        return Optional.of(
+        			StockItem.builder()
+        			.itemCode(document.select("#middle > div.h_company > div.wrap_company > div > span.code").text())
+        			.itemName(document.select("#middle > div.h_company > div.wrap_company > h2").text())
+        			.type(MarketType.valueOf(document.select("#middle > div.h_company > div.wrap_company > div > img").attr("class")))
+        			.build());
 	}
 	
-	private Optional<StockPrice> getStockPrice(Document document, StockItem stockItem)
+	private Optional<StockPrice> getStockPrice(Document document)
 	{
 		
-
-        for (Element element : document.select(item_selector) )
-        {
-        	System.out.println("시간 : " + element.select("#time > em").text());
-        }
-        
+		// StockPrice 생성
+		StockPrice stockPrice = StockPrice.builder()
+									.bsDt(document.select("#time > em").text().substring(0, 10).replaceAll(".",  ""))
+									.currentPrice(0)
+									.openPrice(0)
+									.highPrice(0)
+									.lowPrice(0)
+									.amount(0)
+									.build();
     	Elements contents = document.select("#content > div.section.inner_sub > div:nth-child(1) > table > tbody > tr");
 
+    	int i = 0;
     	for ( Element trContent : contents )
     	{	
-    		System.out.println("NODE SIZE " + trContent.childNodeSize());
+    		System.out.println("NODE SIZE " + (i++));
             
             if ( trContent.childNodeSize() == 3 )
             {
@@ -104,13 +99,15 @@ public class StockSiseService {
             Elements thContents = trContent.select("th");
             Elements tdContents = trContent.select("td");
             
-            System.out.println(thContents.get(0).text());
+//            System.out.println(thContents.get(0).text());
 //            System.out.println(tdContents.get(0).text());
-            System.out.println(NumberUtility.convertNumber(tdContents.get(0).text()));
+//            Object obj = NumberUtility.convertNumber(tdContents.get(0).text());
+            System.out.println(thContents.get(0).text() + " : " + NumberUtility.convertNumber(tdContents.get(0).text()) + "==>" + NumberUtility.convertNumber(tdContents.get(0).text()).getClass().getName());
+            System.out.println(thContents.get(1).text() + " : " + NumberUtility.convertNumber(tdContents.get(0).text()) + "==>" + NumberUtility.convertNumber(tdContents.get(1).text()).getClass().getName());
 
             //System.out.println("ATTRIBUTE : " + tdContents.hasClass("num"));
-            System.out.println(thContents.get(1).text());
-            System.out.println(tdContents.get(1).text());
+//            System.out.println(thContents.get(1).text());
+//            System.out.println(tdContents.get(1).text());
             
 //            StockPrice.builder()
 //            	.currentPrice(0)

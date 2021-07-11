@@ -2,21 +2,32 @@ package com.realizer.FinanceRestServer.util;
 
 public class NumberUtility 
 {
-	// 숫자와 부호만 남겨놓고 제거하는 필터
-	private static final String filter = "[^0-9]*.";
+	// 부호, 정수, 실수를 확인하는 Filter
+	private static final String filter = "^[+-]?\\d*(\\.?\\d*)$";
 
 	public static Object convertNumber(String str)
-	{		
-		System.out.println("======>" + str);
-		System.out.println("======>" + str.replaceAll(filter, ""));
+	{	
+		// 지정된 문자열 제거
+		String convertStr = str.replaceAll(",", "")
+				.replaceAll("%", "")
+				.replaceAll(" ", "")
+				.replaceAll("하락", "-")
+				.replaceAll("상승", "+");
+		
 		// 실수형이면
-		if ( str.contains(".") )
+		if ( convertStr.contains(".") )
 		{
-			return Double.parseDouble(str.replaceAll(filter, ""));
+			return Double.parseDouble(convertStr);
 		}
+		// 정수형
+		else if ( convertStr.matches(filter) )
+		{
+			return Long.parseLong(convertStr);
+		}
+		// 문자형
 		else
 		{
-			return Integer.parseInt(str.replaceAll(filter, ""));
+			return convertStr;
 		}
 	}
 }

@@ -51,8 +51,7 @@ public class StockPrice {
 	// 거래량
 	private long amount;
 	
-	@OneToOne 
-	@JoinColumn(name = "ADD_INFO_ID")
+	@OneToOne (mappedBy = "stockPrice")
 	private StockPriceAdditionalInfo stockPriceAdditionalInfo;
 	
 	@CreationTimestamp

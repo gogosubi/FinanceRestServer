@@ -1,9 +1,10 @@
 package com.realizer.FinanceRestServer.model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,10 +25,10 @@ public class StockPriceAdditionalInfo {
 	private long totalMarketPrice;
 	
 	// 52주고가
-	private long year_high_price;
+	private long yearHighPrice;
 	
 	// 52주저가
-	private long year_low_price;
+	private long yearLowPrice;
 	
 	// PER
 	private double per;
@@ -49,4 +50,8 @@ public class StockPriceAdditionalInfo {
 	
 	// 배당수익률
 	private double dyRate;
+	
+	@OneToOne 
+	@JoinColumn(name = "PRICE_ID")
+	private StockPrice stockPrice;
 }

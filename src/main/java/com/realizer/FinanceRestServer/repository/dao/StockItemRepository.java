@@ -1,4 +1,4 @@
-package com.realizer.FinanceRestServer.repository;
+package com.realizer.FinanceRestServer.repository.dao;
 
 import java.util.Optional;
 
