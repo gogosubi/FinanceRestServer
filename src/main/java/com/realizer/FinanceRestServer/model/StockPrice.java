@@ -39,6 +39,9 @@ public class StockPrice {
 	// 현재가
 	private long currentPrice;
 	
+	// 전일대비
+	private long dayToDay;
+	
 	// 시가
 	private long openPrice;
 	

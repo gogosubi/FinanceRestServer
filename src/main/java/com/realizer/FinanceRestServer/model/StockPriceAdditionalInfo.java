@@ -22,7 +22,7 @@ public class StockPriceAdditionalInfo {
 	private Long id;
 	
 	// 시가총액
-	private long totalMarketPrice;
+	private String totalMarketPrice;
 	
 	// 52주고가
 	private long yearHighPrice;

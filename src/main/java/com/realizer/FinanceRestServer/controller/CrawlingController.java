@@ -21,7 +21,7 @@ public class CrawlingController
 	@GetMapping("/stock/sise/{code}")
 	public String crawlingStock(@PathVariable String code)
 	{
-		stockSiseRepository.saveStockSise(code);
+		stockSiseRepository.saveStockSiseDetail(code);
 		return "sise";
 	}
 }

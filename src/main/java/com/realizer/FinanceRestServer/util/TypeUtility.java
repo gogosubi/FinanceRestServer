@@ -1,11 +1,11 @@
 package com.realizer.FinanceRestServer.util;
 
-public class NumberUtility 
+public class TypeUtility 
 {
 	// 부호, 정수, 실수를 확인하는 Filter
 	private static final String filter = "^[+-]?\\d*(\\.?\\d*)$";
 
-	public static Object convertNumber(String str)
+	public static Object convertType(String str)
 	{	
 		// 지정된 문자열 제거
 		String convertStr = str.replaceAll(",", "")
@@ -27,7 +27,7 @@ public class NumberUtility
 		// 문자형
 		else
 		{
-			return convertStr;
+			return str;
 		}
 	}
 }
