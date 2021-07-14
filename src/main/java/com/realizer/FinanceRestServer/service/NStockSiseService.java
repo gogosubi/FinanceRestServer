@@ -15,9 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.realizer.FinanceRestServer.model.MarketType;
+import com.realizer.FinanceRestServer.model.StockInvestInfo;
 import com.realizer.FinanceRestServer.model.StockItem;
 import com.realizer.FinanceRestServer.model.StockPrice;
 import com.realizer.FinanceRestServer.model.StockPriceAdditionalInfo;
+import com.realizer.FinanceRestServer.repository.dao.StockInvestInfoRepository;
 import com.realizer.FinanceRestServer.repository.dao.StockItemRepository;
 import com.realizer.FinanceRestServer.repository.dao.StockPriceAdditionalInfoRepository;
 import com.realizer.FinanceRestServer.repository.dao.StockPriceRepository;
@@ -27,20 +29,24 @@ import com.realizer.FinanceRestServer.util.TypeUtility;
 
 @Service
 public class NStockSiseService implements StockSiseRepository {
+	// 종목정보
 	private StockItemRepository stockItemRepository;
-	
+	// 가격정보
 	private StockPriceRepository stockPriceRepository;
-	
+	// 추가정보
 	private StockPriceAdditionalInfoRepository stockPriceAdditionalInfoRepository;
+	// 투자정보
+	private StockInvestInfoRepository stockInvestInfoRepository;
 	
 	@Value("${stock.sise.url}")
 	private String stockSiseUrl;
 
-	public NStockSiseService(StockItemRepository stockItemRepository, StockPriceRepository stockPriceRepository, StockPriceAdditionalInfoRepository stockPriceAdditionalInfoRepository) 
+	public NStockSiseService(StockItemRepository stockItemRepository, StockPriceRepository stockPriceRepository, StockPriceAdditionalInfoRepository stockPriceAdditionalInfoRepository, StockInvestInfoRepository stockInvestInfoRepository) 
 	{
 		this.stockItemRepository = stockItemRepository;
 		this.stockPriceRepository = stockPriceRepository;
 		this.stockPriceAdditionalInfoRepository = stockPriceAdditionalInfoRepository;
+		this.stockInvestInfoRepository = stockInvestInfoRepository;
 	}
 	
 	public void saveStockSiseDetail(String code)
@@ -69,6 +75,12 @@ public class NStockSiseService implements StockSiseRepository {
 				.orElseThrow(()->new IllegalArgumentException("전달한 주소[" + stockSiseUrl + "에서 유효한 정보를 가져오지 못했습니다."));
         stockPriceAdditionalInfo.setStockPrice(stockPrice);
         stockPriceAdditionalInfoRepository.save(stockPriceAdditionalInfo);
+        
+        // 종목투자정보
+        StockInvestInfo stockInvestInfo = getStockInvestInfo(document)
+				.orElseThrow(()->new IllegalArgumentException("전달한 주소[" + stockSiseUrl + "에서 유효한 정보를 가져오지 못했습니다."));
+        stockInvestInfo.setStockPrice(stockPrice);
+        stockInvestInfoRepository.save(stockInvestInfo);
 	}
 	
 	private Optional<StockItem> getStockItem(Document document)
@@ -103,26 +115,26 @@ public class NStockSiseService implements StockSiseRepository {
 		return Optional.of(
 					StockPriceAdditionalInfo.builder()
 						.totalMarketPrice(document.select("#content > div.section.inner_sub > div:nth-child(1) > table > tbody > tr:nth-child(12) > td:nth-child(2)").text())
-						.yearHighPrice(0)
-						.yearLowPrice(0)
-						.per(0)
-						.eps(0)
-						.guessPer(0)
-						.guessEps(0)
-						.pbr(0)
-						.bps(0)
-						.dyRate(0)
+						.yearHighPrice((long) TypeUtility.convertType(document.select("#content > div.section.inner_sub > div:nth-child(1) > table > tbody > tr:nth-child(11) > td:nth-child(2)").text()))
+						.yearLowPrice((long) TypeUtility.convertType(document.select("#content > div.section.inner_sub > div:nth-child(1) > table > tbody > tr:nth-child(11) > td:nth-child(4)").text()))
+						.per((double) TypeUtility.convertType(document.select("#content > div.section.inner_sub > div:nth-child(1) > table > tbody > tr:nth-child(10) > td:nth-child(2)").text()))
+						.eps((long) TypeUtility.convertType(document.select("#content > div.section.inner_sub > div:nth-child(1) > table > tbody > tr:nth-child(10) > td:nth-child(4)").text()))
 						.build()
 					);
-		// 시가총액		
-		// 52주고가		
-		// 52주저가		
-		// PER		
-		// EPS		
-		// 추정PER		
-		// 추정EPS		
-		// PBR		
-		// BPS		
-		// 배당수익률
+	}
+	
+	private Optional<StockInvestInfo> getStockInvestInfo(Document document)
+	{
+		return Optional.of(
+					StockInvestInfo.builder()
+						.rank((long) TypeUtility.convertType(document.select("#tab_con1 > div.first > table > tbody > tr:nth-child(2) > td > em").text()))
+						.foreignBurnRate((double) TypeUtility.convertType(document.select("#tab_con1 > div:nth-child(3) > table > tbody > tr.strong > td > em").text()))
+						.guessPer((double) TypeUtility.convertType(document.select("#_cns_per").text()))
+						.guessEps((long) TypeUtility.convertType(document.select("#_cns_eps").text()))
+						.pbr((double) TypeUtility.convertType(document.select("#_pbr").text()))
+						.bps((long) TypeUtility.convertType(document.select("#tab_con1 > div:nth-child(5) > table > tbody:nth-child(3) > tr:nth-child(2) > td > em:nth-child(3)").text()))
+						.dyRate((double) TypeUtility.convertType(document.select("#_dvr").text()))
+						.build()
+					);
 	}
 }

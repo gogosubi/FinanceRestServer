@@ -16,25 +16,31 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-public class StockPriceAdditionalInfo {
+public class StockInvestInfo {
 	@Id 
 	@GeneratedValue 
 	private Long id;
 	
-	// 시가총액
-	private String totalMarketPrice;
+	// 시가총액순위
+	private long rank;
 	
-	// 52주고가
-	private long yearHighPrice;
+	// 외국인소진율
+	private double foreignBurnRate;
 	
-	// 52주저가
-	private long yearLowPrice;
+	// 추정PER
+	private double guessPer;
 	
-	// PER
-	private double per;
+	// 추정EPS
+	private long guessEps;
 	
-	// EPS
-	private long eps;
+	// PBR
+	private double pbr;
+	
+	// BPS
+	private long bps;
+	
+	// 배당수익률
+	private double dyRate;
 	
 	@OneToOne 
 	@JoinColumn(name = "PRICE_ID")

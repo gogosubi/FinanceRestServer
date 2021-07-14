@@ -12,7 +12,8 @@ public class TypeUtility
 				.replaceAll("%", "")
 				.replaceAll(" ", "")
 				.replaceAll("하락", "-")
-				.replaceAll("상승", "+");
+				.replaceAll("상승", "+")
+				.replaceAll("∞", "9999.99");
 		
 		// 실수형이면
 		if ( convertStr.contains(".") )
@@ -27,6 +28,8 @@ public class TypeUtility
 		// 문자형
 		else
 		{
+			System.out.println("========>" + convertStr);
+			System.out.println(str);
 			return str;
 		}
 	}
