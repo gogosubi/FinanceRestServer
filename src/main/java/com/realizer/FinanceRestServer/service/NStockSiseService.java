@@ -1,28 +1,20 @@
 package com.realizer.FinanceRestServer.service;
 
-import java.sql.Timestamp;
-import java.text.NumberFormat;
 import java.util.Optional;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.CreationTimestamp;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.realizer.FinanceRestServer.model.MarketType;
-import com.realizer.FinanceRestServer.model.StockInvestInfo;
-import com.realizer.FinanceRestServer.model.StockItem;
-import com.realizer.FinanceRestServer.model.StockPrice;
-import com.realizer.FinanceRestServer.model.StockPriceAdditionalInfo;
-import com.realizer.FinanceRestServer.repository.dao.StockInvestInfoRepository;
-import com.realizer.FinanceRestServer.repository.dao.StockItemRepository;
-import com.realizer.FinanceRestServer.repository.dao.StockPriceAdditionalInfoRepository;
-import com.realizer.FinanceRestServer.repository.dao.StockPriceRepository;
+import com.realizer.FinanceRestServer.model.item.MarketType;
+import com.realizer.FinanceRestServer.model.item.StockInvestInfo;
+import com.realizer.FinanceRestServer.model.item.StockItem;
+import com.realizer.FinanceRestServer.model.item.StockPrice;
+import com.realizer.FinanceRestServer.model.item.StockPriceAdditionalInfo;
+import com.realizer.FinanceRestServer.repository.dao.item.StockInvestInfoRepository;
+import com.realizer.FinanceRestServer.repository.dao.item.StockItemRepository;
+import com.realizer.FinanceRestServer.repository.dao.item.StockPriceAdditionalInfoRepository;
+import com.realizer.FinanceRestServer.repository.dao.item.StockPriceRepository;
 import com.realizer.FinanceRestServer.repository.service.StockSiseRepository;
 import com.realizer.FinanceRestServer.util.Crawler;
 import com.realizer.FinanceRestServer.util.TypeUtility;

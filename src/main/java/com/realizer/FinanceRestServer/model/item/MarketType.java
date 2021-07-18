@@ -1,4 +1,4 @@
-package com.realizer.FinanceRestServer.model;
+package com.realizer.FinanceRestServer.model.item;
 
 public enum MarketType {
 	kospi, kosdaq, konex, none;

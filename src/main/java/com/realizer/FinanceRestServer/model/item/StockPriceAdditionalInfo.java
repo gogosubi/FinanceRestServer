@@ -1,4 +1,4 @@
-package com.realizer.FinanceRestServer.model;
+package com.realizer.FinanceRestServer.model.item;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,6 +37,6 @@ public class StockPriceAdditionalInfo {
 	private long eps;
 	
 	@OneToOne 
-	@JoinColumn(name = "PRICE_ID")
+	@JoinColumn(name = "price_id")
 	private StockPrice stockPrice;
 }

@@ -1,15 +1,20 @@
-package com.realizer.FinanceRestServer.model;
+package com.realizer.FinanceRestServer.model.item;
 
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.realizer.FinanceRestServer.model.group.GroupItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

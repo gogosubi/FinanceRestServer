@@ -1,16 +1,21 @@
-package com.realizer.FinanceRestServer.model;
+package com.realizer.FinanceRestServer.model.item;
 
 import java.sql.Timestamp;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.realizer.FinanceRestServer.model.group.GroupStock;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,6 +61,9 @@ public class StockPrice {
 	
 	@OneToOne (mappedBy = "stockPrice")
 	private StockPriceAdditionalInfo stockPriceAdditionalInfo;
+	
+    @OneToMany(mappedBy = "stockPrice",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupStock> groupStockList;
 	
 	@CreationTimestamp
 	private Timestamp createDate;

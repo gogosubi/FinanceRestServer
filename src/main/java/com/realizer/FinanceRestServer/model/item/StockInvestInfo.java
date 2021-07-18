@@ -1,7 +1,8 @@
-package com.realizer.FinanceRestServer.model;
+package com.realizer.FinanceRestServer.model.item;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class StockInvestInfo {
 	@Id 
-	@GeneratedValue 
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가 
 	private Long id;
 	
 	// 시가총액순위
