@@ -17,9 +17,21 @@ public class NCrawlingController
 	}
 
 	@GetMapping("/stock/sise/{code}")
-	public String crawlingStock(@PathVariable String code)
+	public String getStock(@PathVariable String code)
 	{
 		stockSiseRepository.saveStockSiseDetail(code);
 		return "sise";
+	}
+	
+	@GetMapping("/stock/sise_day/{code}/{st_dt}/{nd_dt}")
+	public String getPeriodStock(@PathVariable String st_dt, @PathVariable String nd_dt, @PathVariable String code)
+	{
+		stockSiseRepository.savePeriodStockPrice(st_dt, nd_dt, code);
+		return "";
+	}
+	
+	public String getGroupStock(@PathVariable String groupCode)
+	{
+		return "group";
 	}
 }

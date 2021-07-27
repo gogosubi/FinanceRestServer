@@ -1,8 +1,10 @@
 package com.realizer.FinanceRestServer.service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,9 @@ public class NStockSiseService implements StockSiseRepository {
 	
 	@Value("${stock.sise.url}")
 	private String stockSiseUrl;
+	
+	@Value("${stock.sise.day_url}")
+	private String stockSiseDayUrl;
 
 	public NStockSiseService(StockItemRepository stockItemRepository, StockPriceRepository stockPriceRepository, StockPriceAdditionalInfoRepository stockPriceAdditionalInfoRepository, StockInvestInfoRepository stockInvestInfoRepository) 
 	{
@@ -39,6 +44,33 @@ public class NStockSiseService implements StockSiseRepository {
 		this.stockPriceRepository = stockPriceRepository;
 		this.stockPriceAdditionalInfoRepository = stockPriceAdditionalInfoRepository;
 		this.stockInvestInfoRepository = stockInvestInfoRepository;
+	}
+	
+	public void savePeriodStockPrice(String st_dt, String nd_dt, String code)
+	{
+		StringBuilder url = new StringBuilder(stockSiseUrl);
+		url.append(code);
+		System.out.println(url);
+		Document document = Crawler.getCrawlingSite(url.toString());
+
+        // 종목정보가 처음인 경우 종목 정보 저장
+        StockItem stockItem = getStockItem(document)
+        						.orElseThrow(()->new IllegalArgumentException("전달한 주소[" + stockSiseUrl + "에서 유효한 정보를 가져오지 못했습니다."));
+		
+        // 종목정보가 처음인 경우 종목 정보 저장
+        stockItemRepository.findByitemCode(stockItem.getItemCode())
+                            .orElse(stockItemRepository.save(stockItem));
+        
+        url = new StringBuilder(stockSiseDayUrl);
+        url.append(code);
+        url.append("&page=");
+        
+        // 종목시세정보
+        for ( StockPrice stockPrice : getPeriodStockPrice(url.toString(), st_dt, nd_dt) )
+        {
+        	stockPrice.setStockItem(stockItem);
+            stockPriceRepository.save(stockPrice);
+        }		
 	}
 	
 	public void saveStockSiseDetail(String code)
@@ -100,6 +132,68 @@ public class NStockSiseService implements StockSiseRepository {
 						.lowPrice((long) TypeUtility.convertType(document.select("#content > div.section.inner_sub > div:nth-child(1) > table > tbody > tr:nth-child(6) > td:nth-child(4)").text()))
 						.build()
 					);	
+	}
+	
+	private ArrayList<StockPrice> getPeriodStockPrice(String url, String st_dt, String nd_dt)
+	{	
+		ArrayList<StockPrice> stockPriceList = new ArrayList<>();
+		System.out.println("들어오다.");
+		int page = 1;
+		boolean searchFlag = true;
+		
+		while ( searchFlag )
+		{
+			StringBuilder sb = new StringBuilder(url);
+			sb.append(page);
+			System.out.println(sb.toString());
+			
+			Document document = Crawler.getCrawlingSite(sb.toString());
+			
+			for ( Element element : document.select("body > table.type2 > tbody") )
+			{
+				System.out.println("테이블");
+				int trCount = 0;
+				
+				for ( Element trElement : element.select("tr") )
+				{
+					trCount++;
+					System.out.println("TR COUNT : " + trCount);
+					
+					System.out.println(trElement.text());
+					if ( trElement.hasAttr("onMouseOver") )
+					{
+						System.out.println("내가 원하는 곳");
+						String bs_dt = trElement.select("td:nth-child(1) > span").text().substring(0, 10).replaceAll("\\.",  "");
+						System.out.println(bs_dt);
+						
+						if ( bs_dt.compareTo(st_dt) < 0 )
+						{
+							searchFlag = false;
+							break;
+						}
+						else if ( bs_dt.compareTo(nd_dt) <= 0 )
+						{
+							stockPriceList.add(
+									StockPrice.builder()
+										.bsDt(bs_dt)
+										.currentPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(2)").text()))
+										.dayToDay((long) TypeUtility.convertType(trElement.select("td:nth-child(3)").text()))
+										.amount((long) TypeUtility.convertType(trElement.select("td:nth-child(7)").text()))
+										.openPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(4)").text()))
+										.highPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(5)").text()))
+										.lowPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(6)").text()))
+										.build()
+									);
+						}
+					}
+				}
+			}
+			
+			page += 1;
+			System.out.println("Page출력 : " + page);
+		}
+		
+		return stockPriceList;
 	}
 	
 	private Optional<StockPriceAdditionalInfo> getStockPriceAdditionalInfo(Document document)

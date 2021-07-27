@@ -7,6 +7,7 @@ public class TypeUtility
 
 	public static Object convertType(String str)
 	{	
+		System.out.println("입력 문자열 : " + str);
 		// 지정된 문자열 제거
 		String convertStr = str.replaceAll(",", "")
 				.replaceAll("%", "")
