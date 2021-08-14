@@ -30,8 +30,10 @@ public class NCrawlingController
 		return "";
 	}
 	
-	public String getGroupStock(@PathVariable String groupCode)
+	@GetMapping("/stock/upjong")
+	public String getGroupStock()
 	{
+		stockSiseRepository.saveStockGroupPrice();
 		return "group";
 	}
 }

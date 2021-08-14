@@ -3,11 +3,16 @@ package com.realizer.FinanceRestServer.service;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.realizer.FinanceRestServer.model.group.GroupItem;
+import com.realizer.FinanceRestServer.model.group.GroupPrice;
 import com.realizer.FinanceRestServer.model.item.MarketType;
 import com.realizer.FinanceRestServer.model.item.StockInvestInfo;
 import com.realizer.FinanceRestServer.model.item.StockItem;
@@ -37,6 +42,9 @@ public class NStockSiseService implements StockSiseRepository {
 	
 	@Value("${stock.sise.day_url}")
 	private String stockSiseDayUrl;
+	
+	@Value("${stock.sise.upjong}")
+	private String stockUpjongUrl;
 
 	public NStockSiseService(StockItemRepository stockItemRepository, StockPriceRepository stockPriceRepository, StockPriceAdditionalInfoRepository stockPriceAdditionalInfoRepository, StockInvestInfoRepository stockInvestInfoRepository) 
 	{
@@ -107,6 +115,21 @@ public class NStockSiseService implements StockSiseRepository {
         stockInvestInfoRepository.save(stockInvestInfo);
 	}
 	
+	@Override
+	public void saveStockGroupPrice() {
+		// TODO Auto-generated method stub
+		StringBuilder url = new StringBuilder(stockUpjongUrl);
+		System.out.println(url);
+		Document document = Crawler.getCrawlingSite(url.toString());
+
+        // 종목정보가 처음인 경우 종목 정보 저장
+        for ( GroupPrice groupPrice : getGroupPriceList(document) )
+        {
+        	
+        }
+		
+	}
+
 	private Optional<StockItem> getStockItem(Document document)
 	{
         return Optional.of(
@@ -133,11 +156,26 @@ public class NStockSiseService implements StockSiseRepository {
 						.build()
 					);	
 	}
+
+	private ArrayList<GroupPrice> getGroupPriceList(Document document)
+	{
+		ArrayList<GroupPrice> groupPriceList = new ArrayList<>();
+		
+		for ( Element element : document.select("#contentarea_left > table > tbody > tr > td") )
+		{
+			if ( element.hasAttr("href") )
+			{
+				System.out.println(element.text());
+			}
+		}
+		
+		return groupPriceList;
+	}
 	
 	private ArrayList<StockPrice> getPeriodStockPrice(String url, String st_dt, String nd_dt)
 	{	
 		ArrayList<StockPrice> stockPriceList = new ArrayList<>();
-		System.out.println("들어오다.");
+		
 		int page = 1;
 		boolean searchFlag = true;
 		
@@ -149,42 +187,32 @@ public class NStockSiseService implements StockSiseRepository {
 			
 			Document document = Crawler.getCrawlingSite(sb.toString());
 			
-			for ( Element element : document.select("body > table.type2 > tbody") )
+			for ( Element element : document.select("body > table.type2 > tbody > tr") )
 			{
-				System.out.println("테이블");
-				int trCount = 0;
-				
-				for ( Element trElement : element.select("tr") )
+				if ( element.hasAttr("onMouseOver") )
 				{
-					trCount++;
-					System.out.println("TR COUNT : " + trCount);
+					System.out.println("내가 원하는 곳");
+					String bs_dt = element.select("td:nth-child(1) > span").text().substring(0, 10).replaceAll("\\.",  "");
+					System.out.println(bs_dt);
 					
-					System.out.println(trElement.text());
-					if ( trElement.hasAttr("onMouseOver") )
+					if ( bs_dt.compareTo(st_dt) < 0 )
 					{
-						System.out.println("내가 원하는 곳");
-						String bs_dt = trElement.select("td:nth-child(1) > span").text().substring(0, 10).replaceAll("\\.",  "");
-						System.out.println(bs_dt);
-						
-						if ( bs_dt.compareTo(st_dt) < 0 )
-						{
-							searchFlag = false;
-							break;
-						}
-						else if ( bs_dt.compareTo(nd_dt) <= 0 )
-						{
-							stockPriceList.add(
-									StockPrice.builder()
-										.bsDt(bs_dt)
-										.currentPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(2)").text()))
-										.dayToDay((long) TypeUtility.convertType(trElement.select("td:nth-child(3)").text()))
-										.amount((long) TypeUtility.convertType(trElement.select("td:nth-child(7)").text()))
-										.openPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(4)").text()))
-										.highPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(5)").text()))
-										.lowPrice((long) TypeUtility.convertType(trElement.select("td:nth-child(6)").text()))
-										.build()
-									);
-						}
+						searchFlag = false;
+						break;
+					}
+					else if ( bs_dt.compareTo(nd_dt) <= 0 )
+					{
+						stockPriceList.add(
+								StockPrice.builder()
+									.bsDt(bs_dt)
+									.currentPrice((long) TypeUtility.convertType(element.select("td:nth-child(2)").text()))
+									.dayToDay((long) TypeUtility.convertType(element.select("td:nth-child(3)").text()))
+									.amount((long) TypeUtility.convertType(element.select("td:nth-child(7)").text()))
+									.openPrice((long) TypeUtility.convertType(element.select("td:nth-child(4)").text()))
+									.highPrice((long) TypeUtility.convertType(element.select("td:nth-child(5)").text()))
+									.lowPrice((long) TypeUtility.convertType(element.select("td:nth-child(6)").text()))
+									.build()
+								);
 					}
 				}
 			}
