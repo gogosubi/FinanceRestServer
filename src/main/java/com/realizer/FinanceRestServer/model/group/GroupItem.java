@@ -25,14 +25,11 @@ public class GroupItem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가
 	private Long id;
 	
-	// 종목코드
-	private String groupCode;
+	// 종목번호
+	private long groupNo;
 	
 	/* 업종명 */
 	private String groupName;
-	
-	// 전일대비
-	private double dayToDayRate;
 	
     @OneToMany(mappedBy = "groupItem",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupStock> groupStockList;
